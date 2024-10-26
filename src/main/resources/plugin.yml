@@ -1,0 +1,17 @@
+name: TChat
+version: '1.0'
+main: me.malaguti.tChat.TChat
+api-version: '1.21'
+
+commands:
+  g:
+    description: Enviar mensagem no chat global.
+    usage: /g <mensagem>
+  tell:
+    description: Enviar mensagem privada para alguém.
+    usage: /tell <player> <mensagem>
+
+permissions:
+  tchat.colors:
+    description: "Permite que o jogador use cores nas mensagens."
+    default: op
