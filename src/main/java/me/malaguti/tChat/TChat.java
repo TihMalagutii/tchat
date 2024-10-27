@@ -28,6 +28,7 @@ public final class TChat extends JavaPlugin {
         // Registrando o comando /g
         Objects.requireNonNull(getCommand("g")).setExecutor(this);
         Objects.requireNonNull(getCommand("tell")).setExecutor(this);
+        Objects.requireNonNull(getCommand("tchat")).setExecutor(this);
 
         // Registrando o listener de chat local
         getServer().getPluginManager().registerEvents(new LocalChatListener(this), this);
@@ -77,7 +78,22 @@ public final class TChat extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(command.getName().equalsIgnoreCase("g")) {
+        if(command.getName().equalsIgnoreCase("tchat")) {
+            // Comando /tchat
+            if(args.length > 0 && args[0].equalsIgnoreCase("reload")) {
+                if(sender.hasPermission("tchat.reload")) {
+                    reloadConfig();
+                    createMainConfig();
+                    loadMessagesConfig();
+                    sender.sendMessage("§6[TChat] §eplugin has been reloaded.");
+                } else {
+                    sender.sendMessage("§6[TChat] §cYou do not have permission to do this.");
+                }
+                return true;
+            }
+            sender.sendMessage("§cUsage: /tchat reload");
+            return true;
+        } else if(command.getName().equalsIgnoreCase("g")) {
             // Comando /g - Chat Global
             if(sender instanceof Player) {
                 Player player = (Player) sender;
