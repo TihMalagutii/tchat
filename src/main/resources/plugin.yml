@@ -14,6 +14,9 @@ commands:
   tell:
     description: Send private message to anyone.
     usage: /tell <player> <message>
+  chat:
+    description: Switches the player's default chat mode between global and local.
+    usage: /chat <global|local>
 
 permissions:
   tchat.colors:

@@ -5,6 +5,10 @@
 # The placeholder can only be used in messages where it is already present.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+# * Messages *
+chat_mode_set: "&6[TChat] &fDefault channel set to: &e"
+warn_mode_set: "Usage: /chat <global|local>"
+
 # * Private channel *
 # Message sent to the sender of the private message
 private_message_sender: "&2[Private] &7To &8%player%&7: "

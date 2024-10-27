@@ -5,6 +5,10 @@
 # o placeholder pode ser usado apenas nas mensagens em que ele ja esta.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+# * Mensagens *
+chat_mode_set: "&6[TChat] &fCanal padrão setado como: &e"
+warn_mode_set: "Uso correto: /chat <global|local>"
+
 # * Canal privado *
 # Mensagem que retorna para quem esta enviando a mensagem privada
 private_message_sender: "&2[Privado] &7Para &8%player%&7: "

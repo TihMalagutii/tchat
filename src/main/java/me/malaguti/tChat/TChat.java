@@ -10,11 +10,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Objects;
 
 public final class TChat extends JavaPlugin {
 
     private FileConfiguration config;
+    private final HashMap<Player, String> playerChatMode = new HashMap<>(); // Armazena o chat padrão do jogador
 
     @Override
     public void onEnable() {
@@ -29,6 +31,7 @@ public final class TChat extends JavaPlugin {
         Objects.requireNonNull(getCommand("g")).setExecutor(this);
         Objects.requireNonNull(getCommand("tell")).setExecutor(this);
         Objects.requireNonNull(getCommand("tchat")).setExecutor(this);
+        Objects.requireNonNull(getCommand("chat")).setExecutor(this);
 
         // Registrando o listener de chat local
         getServer().getPluginManager().registerEvents(new LocalChatListener(this), this);
@@ -74,6 +77,14 @@ public final class TChat extends JavaPlugin {
 
     public int getChatRange() {
         return getConfig().getInt("chat-range", 100); // 100 é o valor padrão se não estiver definido
+    }
+
+    public String getPlayerChatMode(Player player) {
+        return playerChatMode.getOrDefault(player, "local"); // Retorna 'local' como padrão
+    }
+
+    public void setPlayerChatMode(Player player, String mode) {
+        playerChatMode.put(player, mode);
     }
 
     @Override
@@ -179,6 +190,26 @@ public final class TChat extends JavaPlugin {
                 sender.sendMessage("§cOnly players can use this command.");
                 return false;
             }
+        } else if(command.getName().equalsIgnoreCase("chat")) {
+            if(sender instanceof Player player) {
+                if(args.length > 0) {
+                    String mode = args[0].toLowerCase();
+                    if(mode.equals("global") || mode.equals("local")) {
+                        setPlayerChatMode(player, mode);
+                        String message = Objects.requireNonNull(getConfigMessages().getString("chat_mode_set"));
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', message) + mode);
+                    } else {
+                        String message = Objects.requireNonNull(getConfigMessages().getString("warn_mode_set"));
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                    }
+                } else {
+                    String message = Objects.requireNonNull(getConfigMessages().getString("warn_mode_set"));
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                }
+            } else {
+                sender.sendMessage("§cOnly players can use this command.");
+            }
+            return true;
         }
         return false;
     }

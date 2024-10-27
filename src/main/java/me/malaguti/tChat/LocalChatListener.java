@@ -23,47 +23,57 @@ public class LocalChatListener implements Listener {
         Player sender = event.getPlayer();
         String message = event.getMessage();
 
-        // Verifica se o jogador tem a permissão
-        if(sender.hasPermission("tchat.colors")) {
-            // Permite que os jogadores usem cores nas mensagem
-            message = ChatColor.translateAlternateColorCodes('&', message);
-        }
+        // Verifica o chat padrão do jogador
+        String chatMode = plugin.getPlayerChatMode(sender);
 
-        boolean hasPlayers = false;
+        if(chatMode.equals("global")) {
+            event.setCancelled(true); // Cancela o evento para que não seja enviado no chat local
+            if(sender.hasPermission("tchat.colors")) {
+                // Permite que os jogadores usem cores nas mensagem
+                message = ChatColor.translateAlternateColorCodes('&', message);
+            }
+            String globalMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("global_chat"))
+                    .replace("%player%", sender.getName());
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', globalMessage) + message);
+        } else {
+            // Chat Local (padrão)
+            if(sender.hasPermission("tchat.colors")) {
+                message = ChatColor.translateAlternateColorCodes('&', message);
+            }
 
-        // Limita a mensagem aos jogadores dentro do raio especificado
-        event.getRecipients().clear(); // Limpa todos os destinatarios padrão
-        for(Player player : sender.getWorld().getPlayers()) {
-            // Limite de distancia em blocos
-            int chatRange = plugin.getChatRange();
-            if(player != sender && player.getLocation().distance(sender.getLocation()) <= chatRange) {
-                event.getRecipients().add(player); // Adiciona somente os jogadores proximos
-                event.getRecipients().add(sender);
-                hasPlayers = true;
+            boolean hasPlayers = false;
+            // Limita a mensagem aos jogadores dentro do raio especificado
+            event.getRecipients().clear(); // Limpa todos os destinatarios padrão
+            for(Player player : sender.getWorld().getPlayers()) {
+                // Limite de distancia em blocos
+                if(player != sender && player.getLocation().distance(sender.getLocation()) <= plugin.getChatRange()) {
+                    event.getRecipients().add(player); // Adiciona somente os jogadores proximos
+                    event.getRecipients().add(sender);
+                    hasPlayers = true;
+                }
+            }
+
+            if(hasPlayers) {
+                // Formata a mensagem no chat local
+
+                String localMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("local_chat"))
+                        .replace("%player%", sender.getName());
+                localMessage = ChatColor.translateAlternateColorCodes('&', localMessage);
+                event.setFormat(localMessage + message);
+                // event.setFormat("§e[L] §f" + sender.getName() + "§e: " + message);
+            } else {
+                String localMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("local_chat"))
+                        .replace("%player%", sender.getName());
+                localMessage = ChatColor.translateAlternateColorCodes('&', localMessage);
+                sender.sendMessage(localMessage + message);
+                // sender.sendMessage("§e[L] §f" + sender.getName() + "§e: " + message);
+
+                String errorMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("no_players_near"));
+                String formattedMessage = ChatColor.translateAlternateColorCodes('&', errorMessage);
+                sender.sendMessage(formattedMessage);
+                // sender.sendMessage("§cNão tem ninguém perto para ouvir sua mensagem");
             }
         }
-
-        if(hasPlayers) {
-            // Formata a mensagem no chat local
-
-            String localMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("local_chat"))
-                    .replace("%player%", sender.getName());
-            localMessage = ChatColor.translateAlternateColorCodes('&', localMessage);
-            event.setFormat(localMessage + message);
-            // event.setFormat("§e[L] §f" + sender.getName() + "§e: " + message);
-        } else {
-            String localMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("local_chat"))
-                    .replace("%player%", sender.getName());
-            localMessage = ChatColor.translateAlternateColorCodes('&', localMessage);
-            sender.sendMessage(localMessage + message);
-            // sender.sendMessage("§e[L] §f" + sender.getName() + "§e: " + message);
-
-            String errorMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("no_players_near"));
-            String formattedMessage = ChatColor.translateAlternateColorCodes('&', errorMessage);
-            sender.sendMessage(formattedMessage);
-            // sender.sendMessage("§cNão tem ninguém perto para ouvir sua mensagem");
-        }
-
 
     }
 
