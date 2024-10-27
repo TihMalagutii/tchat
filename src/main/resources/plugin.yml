@@ -2,6 +2,7 @@ name: TChat
 version: '1.0'
 main: me.malaguti.tChat.TChat
 api-version: '1.21'
+depend: [LuckPerms]
 
 commands:
   tchat:

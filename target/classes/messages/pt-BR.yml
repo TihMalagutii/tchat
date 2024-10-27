@@ -2,12 +2,13 @@
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-
 # placeholders:
 # %player% - Player
+# %prefix% - Grupo do LuckPerms
 # o placeholder pode ser usado apenas nas mensagens em que ele ja esta.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 # * Mensagens *
 chat_mode_set: "&6[TChat] &fCanal padrão setado como: &e"
-warn_mode_set: "Uso correto: /chat <global|local>"
+warn_mode_set: "&cUso correto: /chat <global|local>"
 
 # * Canal privado *
 # Mensagem que retorna para quem esta enviando a mensagem privada
@@ -19,9 +20,9 @@ player_not_found: "&cJogador não encontrado ou offline."
 error_private_message_sender: "&cVocê não pode enviar uma mensagem privada para si mesmo."
 
 # * Canal global *
-global_chat: "&7[G] &f%player%&7: "
+global_chat: "&7[G] %prefix%&f%player%&7: "
 error_message_global: "&cUso correto: /g <mensagem>"
 
 # * Canal local *
-local_chat: "§e[L] §f%player%§e: "
+local_chat: "&e[L] %prefix%&f%player%&e: "
 no_players_near: "&cNão tem ninguém perto para ouvir sua mensagem"

@@ -32,8 +32,11 @@ public class LocalChatListener implements Listener {
                 // Permite que os jogadores usem cores nas mensagem
                 message = ChatColor.translateAlternateColorCodes('&', message);
             }
+
+            String prefix = plugin.getPrefix(sender);
             String globalMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("global_chat"))
-                    .replace("%player%", sender.getName());
+                    .replace("%player%", sender.getName())
+                    .replace("%prefix%", prefix);
             Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', globalMessage) + message);
         } else {
             // Chat Local (padrão)
@@ -53,17 +56,20 @@ public class LocalChatListener implements Listener {
                 }
             }
 
+            String prefix = plugin.getPrefix(sender);
             if(hasPlayers) {
                 // Formata a mensagem no chat local
 
                 String localMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("local_chat"))
-                        .replace("%player%", sender.getName());
+                        .replace("%player%", sender.getName())
+                        .replace("%prefix%", prefix);
                 localMessage = ChatColor.translateAlternateColorCodes('&', localMessage);
                 event.setFormat(localMessage + message);
                 // event.setFormat("§e[L] §f" + sender.getName() + "§e: " + message);
             } else {
                 String localMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("local_chat"))
-                        .replace("%player%", sender.getName());
+                        .replace("%player%", sender.getName())
+                        .replace("%prefix%", prefix);
                 localMessage = ChatColor.translateAlternateColorCodes('&', localMessage);
                 sender.sendMessage(localMessage + message);
                 // sender.sendMessage("§e[L] §f" + sender.getName() + "§e: " + message);

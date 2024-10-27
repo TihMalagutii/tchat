@@ -1,5 +1,9 @@
 package me.malaguti.tChat;
 
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedMetaData;
+import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -15,6 +19,7 @@ import java.util.Objects;
 
 public final class TChat extends JavaPlugin {
 
+    private LuckPerms luckPerms;
     private FileConfiguration config;
     private final HashMap<Player, String> playerChatMode = new HashMap<>(); // Armazena o chat padrão do jogador
 
@@ -26,6 +31,9 @@ public final class TChat extends JavaPlugin {
         createMainConfig();
         // Carrega o arquivo de mensagens baseado no idioma definido
         loadMessagesConfig();
+
+        // Registrando o luckperms
+        this.luckPerms = getServer().getServicesManager().load(LuckPerms.class);
 
         // Registrando o comando /g
         Objects.requireNonNull(getCommand("g")).setExecutor(this);
@@ -87,6 +95,17 @@ public final class TChat extends JavaPlugin {
         playerChatMode.put(player, mode);
     }
 
+    public String getPrefix(Player player) {
+        if(this.luckPerms != null) {
+            CachedMetaData metaData = this.luckPerms.getPlayerAdapter(Player.class).getMetaData(player);
+            String prefix = metaData.getPrefix();
+            return prefix != null ? prefix : "";
+        } else {
+            getLogger().warning("§cLuckPerms is not initialized correctly.");
+            return "";
+        }
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(command.getName().equalsIgnoreCase("tchat")) {
@@ -116,11 +135,12 @@ public final class TChat extends JavaPlugin {
                         message = ChatColor.translateAlternateColorCodes('&', message); // Adiciona cores à mensage
                     }
 
+                    String prefix = getPrefix(player);
                     String globalMessage = Objects.requireNonNull(getConfigMessages().getString("global_chat"))
-                            .replace("%player%", player.getName());
+                            .replace("%player%", player.getName())
+                            .replace("%prefix%", prefix);
                     globalMessage = ChatColor.translateAlternateColorCodes('&', globalMessage);
                     Bukkit.broadcastMessage(globalMessage + message);
-                    // Bukkit.broadcastMessage("§7[G] §f" + player.getName() + "§7: " + message);
                     return true;
                 } else {
                     String errorMessage = Objects.requireNonNull(getConfigMessages().getString("error_message_global"));
