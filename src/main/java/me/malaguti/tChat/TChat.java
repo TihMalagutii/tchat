@@ -18,9 +18,12 @@ public final class TChat extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getLogger().info("\\u001B[32mTchat enabled!\\u001B[0m");
+        getLogger().info("Tchat enabled!");
 
-        createConfig();
+        // Cria o config.yml com a configuração do idioma
+        createMainConfig();
+        // Carrega o arquivo de mensagens baseado no idioma definido
+        loadMessagesConfig();
 
         // Registrando o comando /g
         Objects.requireNonNull(getCommand("g")).setExecutor(this);
@@ -33,28 +36,37 @@ public final class TChat extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        getLogger().info("\u001B[31mTChat disabled!\u001B[0m");
+        getLogger().info("TChat disabled!");
     }
 
-    private void createConfig() {
-        // Cria a pasta se não existir
-        File configFolder = new File(getDataFolder(), "messages");
-        if (!configFolder.exists()) {
-            configFolder.mkdirs();
+    private void createMainConfig() {
+        // Salva o config.yml padrão se ele não existir
+        File configFile = new File(getDataFolder(), "config.yml");
+        if(!configFile.exists()) {
+            saveDefaultConfig();
         }
+    }
 
-        // Cria o arquivo de configuração se não existir
-        File configFile = new File(configFolder, "pt-BR.yml");
+    private void loadMessagesConfig() {
+        // Obtém o nome do arquivo de mensagens do config.yml
+        String messageFileName = getConfig().getString("language-file", "en"); // usa "en" como padrão
+        File configFile = new File(getDataFolder(), "messages/" + messageFileName + ".yml");
+
+        // Salva o arquivo padrão no jar se o arquivo de mensagens não existir
         if (!configFile.exists()) {
-            saveResource("messages/pt-BR.yml", false); // Salva o arquivo padrão no jar
+            saveResource("messages/" + messageFileName + ".yml", false);
         }
 
-        // Carrega o arquivo de configuração
+        // Carrega o arquivo de configuração de mensagens
         config = YamlConfiguration.loadConfiguration(configFile);
     }
 
     public FileConfiguration getConfigMessages() {
         return config;
+    }
+
+    public int getChatRange() {
+        return getConfig().getInt("chat-range", 100); // 100 é o valor padrão se não estiver definido
     }
 
     @Override

@@ -35,7 +35,7 @@ public class LocalChatListener implements Listener {
         event.getRecipients().clear(); // Limpa todos os destinatarios padrão
         for(Player player : sender.getWorld().getPlayers()) {
             // Limite de distancia em blocos
-            int chatRange = 100;
+            int chatRange = plugin.getChatRange();
             if(player != sender && player.getLocation().distance(sender.getLocation()) <= chatRange) {
                 event.getRecipients().add(player); // Adiciona somente os jogadores proximos
                 event.getRecipients().add(sender);
