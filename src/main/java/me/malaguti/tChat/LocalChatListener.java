@@ -65,19 +65,16 @@ public class LocalChatListener implements Listener {
                         .replace("%prefix%", prefix);
                 localMessage = ChatColor.translateAlternateColorCodes('&', localMessage);
                 event.setFormat(localMessage + message);
-                // event.setFormat("§e[L] §f" + sender.getName() + "§e: " + message);
             } else {
                 String localMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("local_chat"))
                         .replace("%player%", sender.getName())
                         .replace("%prefix%", prefix);
                 localMessage = ChatColor.translateAlternateColorCodes('&', localMessage);
                 sender.sendMessage(localMessage + message);
-                // sender.sendMessage("§e[L] §f" + sender.getName() + "§e: " + message);
 
                 String errorMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("no_players_near"));
                 String formattedMessage = ChatColor.translateAlternateColorCodes('&', errorMessage);
                 sender.sendMessage(formattedMessage);
-                // sender.sendMessage("§cNão tem ninguém perto para ouvir sua mensagem");
             }
         }
 

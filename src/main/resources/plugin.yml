@@ -26,3 +26,6 @@ permissions:
   tchat.reload:
     description: "Allows the player to reload the Tchat plugin."
     default: op
+  tchat.bypass.cooldown:
+    description: "bypass for cooldown"
+    default: op

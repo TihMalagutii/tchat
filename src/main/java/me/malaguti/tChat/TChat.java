@@ -1,9 +1,7 @@
 package me.malaguti.tChat;
 
 import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.cacheddata.CachedMetaData;
-import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -16,12 +14,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.UUID;
 
 public final class TChat extends JavaPlugin {
 
     private LuckPerms luckPerms;
     private FileConfiguration config;
     private final HashMap<Player, String> playerChatMode = new HashMap<>(); // Armazena o chat padrão do jogador
+    private final HashMap<UUID, Long> chatCooldown = new HashMap<>(); // Mapa para cooldown
+    private  int globalCooldownTime;
 
     @Override
     public void onEnable() {
@@ -31,19 +32,24 @@ public final class TChat extends JavaPlugin {
         createMainConfig();
         // Carrega o arquivo de mensagens baseado no idioma definido
         loadMessagesConfig();
+        globalCooldownTime = getConfig().getInt("global_chat_cooldown", 2);
 
         // Registrando o luckperms
         this.luckPerms = getServer().getServicesManager().load(LuckPerms.class);
 
-        // Registrando o comando /g
-        Objects.requireNonNull(getCommand("g")).setExecutor(this);
-        Objects.requireNonNull(getCommand("tell")).setExecutor(this);
-        Objects.requireNonNull(getCommand("tchat")).setExecutor(this);
-        Objects.requireNonNull(getCommand("chat")).setExecutor(this);
+        // Registrando os comandos
+        registerCommands();
 
         // Registrando o listener de chat local
         getServer().getPluginManager().registerEvents(new LocalChatListener(this), this);
 
+    }
+
+    private void registerCommands() {
+        Objects.requireNonNull(getCommand("g")).setExecutor(this);
+        Objects.requireNonNull(getCommand("tell")).setExecutor(this);
+        Objects.requireNonNull(getCommand("tchat")).setExecutor(this);
+        Objects.requireNonNull(getCommand("chat")).setExecutor(this);
     }
 
     @Override
@@ -128,6 +134,23 @@ public final class TChat extends JavaPlugin {
             if(sender instanceof Player) {
                 Player player = (Player) sender;
 
+                if(!player.hasPermission("tchat.bypass.cooldown")) {
+                    // verifica se o jogador esta no cooldown
+                    if(chatCooldown.containsKey(player.getUniqueId())) {
+                        long lastUsageTime = chatCooldown.get(player.getUniqueId());
+                        long timeSinceLastUse = (System.currentTimeMillis() - lastUsageTime) / 1000;
+
+                        if(timeSinceLastUse < globalCooldownTime) {
+                            int timeLeft = globalCooldownTime - (int) timeSinceLastUse;
+                            String cooldownMessage = ChatColor.RED + "Please wait " + timeLeft + " seconds before using global chat again";
+                            player.sendMessage(cooldownMessage);
+                            return true;
+                        }
+                    }
+                    // Atualiza o tempo do ultimo uso
+                    chatCooldown.put(player.getUniqueId(), System.currentTimeMillis());
+                }
+
                 if(args.length > 0) {
                     String message = String.join(" ", args);
                     // Verifica se o jogador tem a permissão
@@ -146,7 +169,6 @@ public final class TChat extends JavaPlugin {
                     String errorMessage = Objects.requireNonNull(getConfigMessages().getString("error_message_global"));
                     String formattedMessage = ChatColor.translateAlternateColorCodes('&', errorMessage);
                     player.sendMessage(formattedMessage);
-                    // player.sendMessage("§cUso correto: /g <mensagem>");
                     return true;
                 }
             } else {
@@ -167,7 +189,6 @@ public final class TChat extends JavaPlugin {
                             String message = Objects.requireNonNull(getConfigMessages().getString("error_private_message_sender"));
                             String formattedMessage = ChatColor.translateAlternateColorCodes('&', message);
                             player.sendMessage(formattedMessage);
-                            // player.sendMessage("§cVocê não pode enviar uma mensagem privada para si mesmo.");
                             return true;
                         }
 
@@ -189,21 +210,17 @@ public final class TChat extends JavaPlugin {
                                 .replace("%player%", player.getName());
                         privateMessageReceiver = ChatColor.translateAlternateColorCodes('&', privateMessageReceiver);
                         target.sendMessage(privateMessageReceiver, message);
-                        // target.sendMessage("§2[Privado] §7De §8" + player.getName() + "§7: " + message);
-                        // player.sendMessage("§2[Privado] §7Para §8" + target.getName() + "§7: " + message);
                         return true;
                     } else {
                         String errorMessage = Objects.requireNonNull(getConfigMessages().getString("player_not_found"));
                         String formattedMessage = ChatColor.translateAlternateColorCodes('&', errorMessage);
                         player.sendMessage(formattedMessage);
-                        // player.sendMessage("§cJogador não encontrado ou offline.");
                         return true;
                     }
                 } else {
                     String errorMessage = Objects.requireNonNull(getConfigMessages().getString("error_message"));
                     String formattedMessage = ChatColor.translateAlternateColorCodes('&', errorMessage);
                     player.sendMessage(formattedMessage);
-                    // player.sendMessage("§cUso correto: /tell <player> <mensagem>");
                     return true;
                 }
             } else {
