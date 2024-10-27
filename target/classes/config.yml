@@ -1,0 +1,5 @@
+# TChat configuration
+# Set the message file name without the extension
+# ex: "en" for English or "pt-BR" for Brazilian Portuguese
+language-file: "en"
+chat-range: 100  # Set local chat reach in blocks

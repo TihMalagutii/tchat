@@ -48,14 +48,20 @@ public final class TChat extends JavaPlugin {
     }
 
     private void loadMessagesConfig() {
-        // Obtém o nome do arquivo de mensagens do config.yml
-        String messageFileName = getConfig().getString("language-file", "en"); // usa "en" como padrão
-        File configFile = new File(getDataFolder(), "messages/" + messageFileName + ".yml");
+        // Lista de arquivos de mensagens suportados
+        String[] supportedLanguages = {"en", "pt-BR"};
 
-        // Salva o arquivo padrão no jar se o arquivo de mensagens não existir
-        if (!configFile.exists()) {
-            saveResource("messages/" + messageFileName + ".yml", false);
+        // Cria todos os arquivos de mensagens se não existirem
+        for(String language : supportedLanguages) {
+            File languageFile = new File(getDataFolder(), "messages/" + language + ".yml");
+            if(!languageFile.exists()) {
+                saveResource("messages/" + language + ".yml", false);
+            }
         }
+
+        // Obtém o nome do arquivo de mensagens especificado no config.yml
+        String messageFileName = getConfig().getString("language-file", "en");
+        File configFile = new File(getDataFolder(), "messages/" + messageFileName + ".yml");
 
         // Carrega o arquivo de configuração de mensagens
         config = YamlConfiguration.loadConfiguration(configFile);
