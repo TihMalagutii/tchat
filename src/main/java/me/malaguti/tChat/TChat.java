@@ -1,5 +1,6 @@
 package me.malaguti.tChat;
 
+import me.malaguti.tChat.commands.GlobalChannelCommandExecutor;
 import me.malaguti.tChat.commands.TChatCommandExecutor;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
@@ -22,18 +23,13 @@ public final class TChat extends JavaPlugin {
     private LuckPerms luckPerms;
     private FileConfiguration config;
     private final HashMap<Player, String> playerChatMode = new HashMap<>(); // Armazena o chat padrão do jogador
-    private final HashMap<UUID, Long> chatCooldown = new HashMap<>(); // Mapa para cooldown
-    private  int globalCooldownTime;
 
     @Override
     public void onEnable() {
         getLogger().info("Tchat enabled!");
 
-        // Cria o config.yml com a configuração do idioma
         createMainConfig();
-        // Carrega o arquivo de mensagens baseado no idioma definido
         loadMessagesConfig();
-        globalCooldownTime = getConfig().getInt("global_chat_cooldown", 2);
 
         // Registrando o luckperms
         this.luckPerms = getServer().getServicesManager().load(LuckPerms.class);
@@ -48,7 +44,7 @@ public final class TChat extends JavaPlugin {
 
     private void registerCommands() {
         Objects.requireNonNull(getCommand("tchat")).setExecutor(new TChatCommandExecutor(this));
-        Objects.requireNonNull(getCommand("g")).setExecutor(this);
+        Objects.requireNonNull(getCommand("g")).setExecutor(new GlobalChannelCommandExecutor(this));
         Objects.requireNonNull(getCommand("tell")).setExecutor(this);
         Objects.requireNonNull(getCommand("chat")).setExecutor(this);
     }
@@ -113,70 +109,23 @@ public final class TChat extends JavaPlugin {
         }
     }
 
+    public void sendGlobalMessage(Player sender, String message) {
+        if (sender.hasPermission("tchat.colors")) {
+            message = ChatColor.translateAlternateColorCodes('&', message);
+        }
+
+        String prefix = getPrefix(sender);
+        String globalMessage = Objects.requireNonNull(getConfigMessages().getString("global_chat"))
+                .replace("%player%", sender.getName())
+                .replace("%prefix%", prefix);
+
+        globalMessage = ChatColor.translateAlternateColorCodes('&', globalMessage);
+        Bukkit.broadcastMessage(globalMessage + message);
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(command.getName().equalsIgnoreCase("tchat")) {
-            // Comando /tchat
-            if(args.length > 0 && args[0].equalsIgnoreCase("reload")) {
-                if(sender.hasPermission("tchat.reload")) {
-                    reloadConfig();
-                    createMainConfig();
-                    loadMessagesConfig();
-                    sender.sendMessage("§6[TChat] §eplugin has been reloaded.");
-                } else {
-                    sender.sendMessage("§6[TChat] §cYou do not have permission to do this.");
-                }
-                return true;
-            }
-            sender.sendMessage("§cUsage: /tchat reload");
-            return true;
-        } else if(command.getName().equalsIgnoreCase("g")) {
-            // Comando /g - Chat Global
-            if(sender instanceof Player) {
-                Player player = (Player) sender;
-
-                if(!player.hasPermission("tchat.bypass.cooldown")) {
-                    // verifica se o jogador esta no cooldown
-                    if(chatCooldown.containsKey(player.getUniqueId())) {
-                        long lastUsageTime = chatCooldown.get(player.getUniqueId());
-                        long timeSinceLastUse = (System.currentTimeMillis() - lastUsageTime) / 1000;
-
-                        if(timeSinceLastUse < globalCooldownTime) {
-                            int timeLeft = globalCooldownTime - (int) timeSinceLastUse;
-                            String cooldownMessage = ChatColor.RED + "Please wait " + timeLeft + " seconds before using global chat again";
-                            player.sendMessage(cooldownMessage);
-                            return true;
-                        }
-                    }
-                    // Atualiza o tempo do ultimo uso
-                    chatCooldown.put(player.getUniqueId(), System.currentTimeMillis());
-                }
-
-                if(args.length > 0) {
-                    String message = String.join(" ", args);
-                    // Verifica se o jogador tem a permissão
-                    if(player.hasPermission("tchat.colors")) {
-                        message = ChatColor.translateAlternateColorCodes('&', message); // Adiciona cores à mensage
-                    }
-
-                    String prefix = getPrefix(player);
-                    String globalMessage = Objects.requireNonNull(getConfigMessages().getString("global_chat"))
-                            .replace("%player%", player.getName())
-                            .replace("%prefix%", prefix);
-                    globalMessage = ChatColor.translateAlternateColorCodes('&', globalMessage);
-                    Bukkit.broadcastMessage(globalMessage + message);
-                    return true;
-                } else {
-                    String errorMessage = Objects.requireNonNull(getConfigMessages().getString("error_message_global"));
-                    String formattedMessage = ChatColor.translateAlternateColorCodes('&', errorMessage);
-                    player.sendMessage(formattedMessage);
-                    return true;
-                }
-            } else {
-                sender.sendMessage("§cOnly players can use this command.");
-                return false;
-            }
-        } else if(command.getName().equalsIgnoreCase("tell")) {
+        if(command.getName().equalsIgnoreCase("tell")) {
             // Comando /tell - Mensagem privada &2[Privado] &7Para &8Tihghnari&2: &7oi
             if(sender instanceof Player) {
                 Player player = (Player) sender;

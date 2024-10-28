@@ -3,6 +3,7 @@
 # placeholders:
 # %player% - Player
 # %prefix% - LuckPerms group
+# %globalCooldown% - Global chat cooldown
 # The placeholder can only be used in messages where it is already present.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -25,6 +26,7 @@ error_private_message_sender: "&cYou cannot send a private message to yourself."
 # * Global channel *
 global_chat: "&7[G] %prefix%&f%player%&7: "
 error_message_global: "&cCorrect usage: /g <message>"
+global_cooldown_message: "&cPlease wait %globalCooldown% seconds before using global chat again"
 
 # * Local channel *
 local_chat: "&e[L] %prefix%&f%player%&e: "

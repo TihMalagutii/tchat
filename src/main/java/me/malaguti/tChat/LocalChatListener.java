@@ -28,16 +28,7 @@ public class LocalChatListener implements Listener {
 
         if(chatMode.equals("global")) {
             event.setCancelled(true); // Cancela o evento para que não seja enviado no chat local
-            if(sender.hasPermission("tchat.colors")) {
-                // Permite que os jogadores usem cores nas mensagem
-                message = ChatColor.translateAlternateColorCodes('&', message);
-            }
-
-            String prefix = plugin.getPrefix(sender);
-            String globalMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("global_chat"))
-                    .replace("%player%", sender.getName())
-                    .replace("%prefix%", prefix);
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', globalMessage) + message);
+            plugin.sendGlobalMessage(sender, message);
         } else {
             // Chat Local (padrão)
             if(sender.hasPermission("tchat.colors")) {
