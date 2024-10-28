@@ -23,7 +23,7 @@ permissions:
   tchat.colors:
     description: "Allows the player to use colors in messages."
     default: op
-  tchat.reload:
+  tchat.admin:
     description: "Allows the player to reload the Tchat plugin."
     default: op
   tchat.bypass.cooldown:

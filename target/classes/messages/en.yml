@@ -9,6 +9,9 @@
 # * Messages *
 chat_mode_set: "&6[TChat] &fDefault channel set to: &e"
 warn_mode_set: "&cUsage: /chat <global|local>"
+unknown_command: "&cUnknown command. Use /tchat help for commands."
+reload_msg: "&aplugin has been reloaded."
+no_permission_msg: "&cYou do not have permission to do this."
 
 # * Private channel *
 # Message sent to the sender of the private message

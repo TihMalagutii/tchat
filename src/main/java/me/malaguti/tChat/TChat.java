@@ -1,5 +1,6 @@
 package me.malaguti.tChat;
 
+import me.malaguti.tChat.commands.TChatCommandExecutor;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import org.bukkit.Bukkit;
@@ -46,9 +47,9 @@ public final class TChat extends JavaPlugin {
     }
 
     private void registerCommands() {
+        Objects.requireNonNull(getCommand("tchat")).setExecutor(new TChatCommandExecutor(this));
         Objects.requireNonNull(getCommand("g")).setExecutor(this);
         Objects.requireNonNull(getCommand("tell")).setExecutor(this);
-        Objects.requireNonNull(getCommand("tchat")).setExecutor(this);
         Objects.requireNonNull(getCommand("chat")).setExecutor(this);
     }
 
@@ -57,7 +58,7 @@ public final class TChat extends JavaPlugin {
         getLogger().info("TChat disabled!");
     }
 
-    private void createMainConfig() {
+    public void createMainConfig() {
         // Salva o config.yml padrão se ele não existir
         File configFile = new File(getDataFolder(), "config.yml");
         if(!configFile.exists()) {
@@ -65,7 +66,7 @@ public final class TChat extends JavaPlugin {
         }
     }
 
-    private void loadMessagesConfig() {
+    public void loadMessagesConfig() {
         // Lista de arquivos de mensagens suportados
         String[] supportedLanguages = {"en", "pt-BR"};
 
