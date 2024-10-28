@@ -1,6 +1,7 @@
 package me.malaguti.tChat;
 
 import me.malaguti.tChat.commands.GlobalChannelCommandExecutor;
+import me.malaguti.tChat.commands.PrivateChannelCommandExecutor;
 import me.malaguti.tChat.commands.TChatCommandExecutor;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
@@ -45,7 +46,7 @@ public final class TChat extends JavaPlugin {
     private void registerCommands() {
         Objects.requireNonNull(getCommand("tchat")).setExecutor(new TChatCommandExecutor(this));
         Objects.requireNonNull(getCommand("g")).setExecutor(new GlobalChannelCommandExecutor(this));
-        Objects.requireNonNull(getCommand("tell")).setExecutor(this);
+        Objects.requireNonNull(getCommand("tell")).setExecutor(new PrivateChannelCommandExecutor(this));
         Objects.requireNonNull(getCommand("chat")).setExecutor(this);
     }
 
@@ -125,59 +126,7 @@ public final class TChat extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(command.getName().equalsIgnoreCase("tell")) {
-            // Comando /tell - Mensagem privada &2[Privado] &7Para &8Tihghnari&2: &7oi
-            if(sender instanceof Player) {
-                Player player = (Player) sender;
-
-                if(args.length >= 2) {
-                    // Obtendo o nome do jogador alvo e a mensagem
-                    Player target = Bukkit.getPlayer(args[0]);
-                    if(target != null && target.isOnline()) {
-                        // Verifica se o jogador não está enviando uma mensagem para si mesmo
-                        if(target.getName().equals(player.getName())) {
-                            String message = Objects.requireNonNull(getConfigMessages().getString("error_private_message_sender"));
-                            String formattedMessage = ChatColor.translateAlternateColorCodes('&', message);
-                            player.sendMessage(formattedMessage);
-                            return true;
-                        }
-
-                        // Concatena o resto dos argumentos para formar a mensagem
-                        String message = String.join(" ", args).substring(args[0].length()).trim();
-                        // Verifica se o jogador tem a permissão
-                        if(player.hasPermission("tchat.colors")) {
-                            message = ChatColor.translateAlternateColorCodes('&', message);
-                        }
-
-                        // Quem está enviando a mensagem
-                        String privateMessageSender = Objects.requireNonNull(getConfigMessages().getString("private_message_sender"))
-                                        .replace("%player%", target.getName());
-                        privateMessageSender = ChatColor.translateAlternateColorCodes('&', privateMessageSender);
-                        player.sendMessage(privateMessageSender, message);
-
-                        // Quem está recebendo a mensagem
-                        String privateMessageReceiver = Objects.requireNonNull(getConfigMessages().getString("private_message_receiver"))
-                                .replace("%player%", player.getName());
-                        privateMessageReceiver = ChatColor.translateAlternateColorCodes('&', privateMessageReceiver);
-                        target.sendMessage(privateMessageReceiver, message);
-                        return true;
-                    } else {
-                        String errorMessage = Objects.requireNonNull(getConfigMessages().getString("player_not_found"));
-                        String formattedMessage = ChatColor.translateAlternateColorCodes('&', errorMessage);
-                        player.sendMessage(formattedMessage);
-                        return true;
-                    }
-                } else {
-                    String errorMessage = Objects.requireNonNull(getConfigMessages().getString("error_message"));
-                    String formattedMessage = ChatColor.translateAlternateColorCodes('&', errorMessage);
-                    player.sendMessage(formattedMessage);
-                    return true;
-                }
-            } else {
-                sender.sendMessage("§cOnly players can use this command.");
-                return false;
-            }
-        } else if(command.getName().equalsIgnoreCase("chat")) {
+        if(command.getName().equalsIgnoreCase("chat")) {
             if(sender instanceof Player player) {
                 if(args.length > 0) {
                     String mode = args[0].toLowerCase();
