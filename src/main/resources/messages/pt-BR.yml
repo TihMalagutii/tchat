@@ -1,0 +1,33 @@
+# Mensagens
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-
+# placeholders:
+# %player% - Player
+# %prefix% - Grupo do LuckPerms
+# %globalCooldown% - Cooldown do chat global
+# o placeholder pode ser usado apenas nas mensagens em que ele ja esta.
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+# * Mensagens *
+chat_mode_set: "&6[TChat] &fCanal padrão setado como: &e"
+warn_mode_set: "&cUso correto: /chat <global|local>"
+unknown_command: "&cEste comando não existe. Use /tchat help para ver os comandos."
+reload_msg: "&aplugin recarregado com sucesso."
+no_permission_msg: "&cVocê não tem permissão para fazer isso."
+
+# * Canal privado *
+# Mensagem que retorna para quem esta enviando a mensagem privada
+private_message_sender: "&2[Privado] &7Para &8%player%&7: "
+# Mensagem que retorna para quem esta recebendo a mensagem privada
+private_message_receiver: "&2[Privado] &7De &8%player%&7: "
+error_message: "&cUso correto: /tell <player> <mensagem>"
+player_not_found: "&cJogador não encontrado ou offline."
+error_private_message_sender: "&cVocê não pode enviar uma mensagem privada para si mesmo."
+
+# * Canal global *
+global_chat: "&7[G] %prefix%&f%player%&7: "
+error_message_global: "&cUso correto: /g <mensagem>"
+global_cooldown_message: "&cEspere %globalCooldown% segundos antes de usar o chat de novo."
+
+# * Canal local *
+local_chat: "&e[L] %prefix%&f%player%&e: "
+no_players_near: "&cNão tem ninguém perto para ouvir sua mensagem"

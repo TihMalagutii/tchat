@@ -2,16 +2,30 @@ name: TChat
 version: '1.0'
 main: me.malaguti.tChat.TChat
 api-version: '1.21'
+depend: [LuckPerms]
 
 commands:
+  tchat:
+    description: Reload the Tchat plugin
+    usage: /tchat reload
+    permission: tchat.reload
   g:
-    description: Enviar mensagem no chat global.
-    usage: /g <mensagem>
+    description: Send message in global chat.
+    usage: /g <message>
   tell:
-    description: Enviar mensagem privada para alguém.
-    usage: /tell <player> <mensagem>
+    description: Send private message to anyone.
+    usage: /tell <player> <message>
+  chat:
+    description: Switches the player's default chat mode between global and local.
+    usage: /chat <global|local>
 
 permissions:
   tchat.colors:
-    description: "Permite que o jogador use cores nas mensagens."
+    description: "Allows the player to use colors in messages."
+    default: op
+  tchat.admin:
+    description: "Allows the player to reload the Tchat plugin."
+    default: op
+  tchat.bypass.cooldown:
+    description: "bypass for cooldown"
     default: op

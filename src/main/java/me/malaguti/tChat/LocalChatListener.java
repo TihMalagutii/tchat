@@ -1,46 +1,73 @@
 package me.malaguti.tChat;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.util.Objects;
+
 public class LocalChatListener implements Listener {
 
-    private final int chatRange = 100; // Limite de distancia em blocos
+    private final TChat plugin; // Variável para armazenar a instância do plugin
+
+    // Construtor que aceita uma instância do plugin
+    public LocalChatListener(TChat plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player sender = event.getPlayer();
         String message = event.getMessage();
 
-        // Verifica se o jogador tem a permissão
-        if(sender.hasPermission("tchat.colors")) {
-            // Permite que os jogadores usem cores nas mensagem
-            message = ChatColor.translateAlternateColorCodes('&', message);
-        }
+        // Verifica o chat padrão do jogador
+        String chatMode = plugin.getPlayerChatMode(sender);
 
-        boolean hasPlayers = false;
+        if(chatMode.equals("global")) {
+            event.setCancelled(true); // Cancela o evento para que não seja enviado no chat local
+            plugin.sendGlobalMessage(sender, message);
+        } else {
+            // Chat Local (padrão)
+            if(sender.hasPermission("tchat.colors")) {
+                message = ChatColor.translateAlternateColorCodes('&', message);
+            }
 
-        // Limita a mensagem aos jogadores dentro do raio especificado
-        event.getRecipients().clear(); // Limpa todos os destinatarios padrão
-        for(Player player : sender.getWorld().getPlayers()) {
-            if(player != sender && player.getLocation().distance(sender.getLocation()) <= chatRange) {
-                event.getRecipients().add(player); // Adiciona somente os jogadores proximos
-                event.getRecipients().add(sender);
-                hasPlayers = true;
+            boolean hasPlayers = false;
+            // Limita a mensagem aos jogadores dentro do raio especificado
+            event.getRecipients().clear(); // Limpa todos os destinatarios padrão
+            for(Player player : sender.getWorld().getPlayers()) {
+                // Limite de distancia em blocos
+                if(player != sender && player.getLocation().distance(sender.getLocation()) <= plugin.getChatRange()) {
+                    event.getRecipients().add(player); // Adiciona somente os jogadores proximos
+                    event.getRecipients().add(sender);
+                    hasPlayers = true;
+                }
+            }
+
+            String prefix = plugin.getPrefix(sender);
+            if(hasPlayers) {
+                // Formata a mensagem no chat local
+
+                String localMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("local_chat"))
+                        .replace("%player%", sender.getName())
+                        .replace("%prefix%", prefix);
+                localMessage = ChatColor.translateAlternateColorCodes('&', localMessage);
+                event.setFormat(localMessage + message);
+            } else {
+                String localMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("local_chat"))
+                        .replace("%player%", sender.getName())
+                        .replace("%prefix%", prefix);
+                localMessage = ChatColor.translateAlternateColorCodes('&', localMessage);
+                sender.sendMessage(localMessage + message);
+
+                String errorMessage = Objects.requireNonNull(plugin.getConfigMessages().getString("no_players_near"));
+                String formattedMessage = ChatColor.translateAlternateColorCodes('&', errorMessage);
+                sender.sendMessage(formattedMessage);
             }
         }
-
-        if(hasPlayers) {
-            // Formata a mensagem no chat local
-            event.setFormat("§e[L] §f" + sender.getName() + "§e: " + message);
-        } else {
-            sender.sendMessage("§e[L] §f" + sender.getName() + "§e: " + message);
-            sender.sendMessage("§cNão tem ninguém perto para ouvir sua mensagem");
-        }
-
 
     }
 

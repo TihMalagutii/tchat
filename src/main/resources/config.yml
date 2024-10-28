@@ -1,0 +1,8 @@
+# TChat configuration
+# Set the message file name without the extension
+# ex: "en" for English or "pt-BR" for Brazilian Portuguese
+language-file: "en"
+# Set local chat reach in blocks
+chat-range: 100
+# Set global chat cooldown in seconds
+global_chat_cooldown: 2
