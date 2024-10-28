@@ -9,13 +9,16 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public final class TChat extends JavaPlugin {
@@ -129,7 +132,30 @@ public final class TChat extends JavaPlugin {
                 .replace("%prefix%", prefix);
 
         globalMessage = ChatColor.translateAlternateColorCodes('&', globalMessage);
-        Bukkit.broadcastMessage(globalMessage + message);
+
+        // Armazena a mensagem original
+        String processedMessage = message;
+
+        // Lista de jogadores online em lowercase
+        List<Player> mentionedPlayers = new ArrayList<>();
+
+        // Verifica se a mensagem contém o nome de algum jogador online (exceto o sender)
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (!onlinePlayer.equals(sender) && message.toLowerCase().contains(onlinePlayer.getName().toLowerCase())) {
+                // Adiciona o jogador à lista de mencionados
+                mentionedPlayers.add(onlinePlayer);
+
+                // Destaca o nome do jogador em azul na mensagem
+                processedMessage = processedMessage.replaceAll("(?i)" + onlinePlayer.getName(), "§b@" + onlinePlayer.getName() + "§7");
+            }
+        }
+
+        // Envia som apenas para jogadores mencionados
+        for (Player mentionedPlayer : mentionedPlayers) {
+            mentionedPlayer.playSound(mentionedPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 1);
+        }
+
+        Bukkit.broadcastMessage(globalMessage + processedMessage);
     }
     // End Global message method -------------------------------------------------
 }

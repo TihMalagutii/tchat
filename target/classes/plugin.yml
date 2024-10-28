@@ -6,9 +6,9 @@ depend: [LuckPerms]
 
 commands:
   tchat:
-    description: Reload the Tchat plugin
-    usage: /tchat reload
-    permission: tchat.reload
+    description: Admin commands
+    usage: /tchat <help | reload>
+    permission: tchat.admin
   g:
     description: Send message in global chat.
     usage: /g <message>
@@ -17,7 +17,7 @@ commands:
     usage: /tell <player> <message>
   chat:
     description: Switches the player's default chat mode between global and local.
-    usage: /chat <global|local>
+    usage: /chat <global | local>
 
 permissions:
   tchat.colors:
