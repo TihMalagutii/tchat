@@ -1,4 +1,6 @@
 me\malaguti\tChat\commands\GlobalChannelCommandExecutor.class
+me\malaguti\tChat\commands\PrivateChannelCommandExecutor.class
+me\malaguti\tChat\listeners\LocalChatListener.class
+me\malaguti\tChat\commands\ChatModeCommandExecutor.class
 me\malaguti\tChat\commands\TChatCommandExecutor.class
-me\malaguti\tChat\LocalChatListener.class
 me\malaguti\tChat\TChat.class

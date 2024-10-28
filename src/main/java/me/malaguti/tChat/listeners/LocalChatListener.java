@@ -1,6 +1,6 @@
-package me.malaguti.tChat;
+package me.malaguti.tChat.listeners;
 
-import org.bukkit.Bukkit;
+import me.malaguti.tChat.TChat;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

@@ -9,7 +9,7 @@
 
 # * Mensagens *
 chat_mode_set: "&6[TChat] &fCanal padrão setado como: &e"
-warn_mode_set: "&cUso correto: /chat <global|local>"
+warn_mode_set: "&cUso correto: /chat <global | local>"
 unknown_command: "&cEste comando não existe. Use /tchat help para ver os comandos."
 reload_msg: "&aplugin recarregado com sucesso."
 no_permission_msg: "&cVocê não tem permissão para fazer isso."
